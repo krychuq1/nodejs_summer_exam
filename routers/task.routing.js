@@ -191,7 +191,7 @@ taskRouter.delete('/:taskId', checkTokenValidity, function (req, res) {
  *              description: ok
  */
 taskRouter.get('/:id', checkTokenValidity,function (req, res) {
-    console.log('you are gonan update this ', req.params.id);
+    //console.log('you are gonan update this ', req.params.id);
     taskController.findOne(req.params.id).then((task, err) => {
         if(err)
             res.status(400).send(err);

@@ -52,7 +52,7 @@ class ShareTaskController  extends BaseController {
 
                     //resole first promise :)
 
-                    console.log("here");
+                 //   console.log("here");
                     resolve(tasks);
                 })
 

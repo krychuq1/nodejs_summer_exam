@@ -31,11 +31,11 @@ class UserController extends BaseController{
             //check for regex
             if (EMAIL_PATTERN.test(user.email)&&PASS_PATTERN.test(user.password)
                 &&COMPANY_PATTERN.test(user.companyName)) {
-                console.log("Valid user");
+               // console.log("Valid user");
                 //hash password
                 user.password = this.hashPassword(user.password);
                 user.email = this.encrypt(user.email);
-                console.log(user.email);
+                //console.log(user.email);
                 //create new model
                 let userObj = new this.userModel(user);
                 //save new model
@@ -51,7 +51,7 @@ class UserController extends BaseController{
         return new Promise((resolve, reject)=>{
             //get user based on email
 
-            console.log(this.encrypt(data.email));
+            //console.log(this.encrypt(data.email));
 
             this.userModel.findOne({
                 email: this.encrypt(data.email)
@@ -126,7 +126,7 @@ class UserController extends BaseController{
         var decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
         var decrypted = decipher.update(email,'hex','utf8');
         decrypted += decipher.final('utf8');
-        console.log(decrypted, '<--- before return')
+        //console.log(decrypted, '<--- before return')
         return decrypted;
     }
     generateRecoveryToken() {
@@ -173,7 +173,7 @@ class UserController extends BaseController{
         };
 
         sender().sendMail(mailOptions, function(err) {
-            console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
+           // console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
         });
     }
 
@@ -189,7 +189,7 @@ class UserController extends BaseController{
         };
 
         sender().sendMail(mailOptions, function(err) {
-            console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
+            //console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
         });
     }
 
@@ -204,7 +204,7 @@ class UserController extends BaseController{
             //find if user exists
             this.findUser(this.encrypt(request.body.email)).then((user)=>{
 
-                console.log(user);
+                //console.log(user);
 
                 //generate token
                 this.generateRecoveryToken().then((token)=>
@@ -213,29 +213,29 @@ class UserController extends BaseController{
                     user.resetPasswordToken = token;
                     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-                    console.log("reset"+user.resetPasswordToken);
+                    //console.log("reset"+user.resetPasswordToken);
 
                     //save the user
                     user.save().then((saved)=>
                     {
 
-                        console.log("we are sending email");
+                        //console.log("we are sending email");
 
                         this.sendEmail(user,token,request);
                         return resolve(saved);
 
                     },(error)=>{
-                        console.log(error);
+                       // console.log(error);
                         return reject(error);
                     });
 
                 },(error)=>{
-                    console.log(error);
+                  //  console.log(error);
                     return reject(error);
                 });
 
             },(error)=>{
-                console.log(error);
+               // console.log(error);
                 return reject(error);
             });
 
@@ -259,7 +259,7 @@ class UserController extends BaseController{
             //Find the user base on the token
             this.userModel.findOne({ resetPasswordToken: req.params.token, /*resetPasswordExpires: { $gt: Date.now() }*/ }).then((user)=>
             {
-                console.log("user"+user);
+               // console.log("user"+user);
                 return resolve(user);
 
             },(error)=>
@@ -278,7 +278,7 @@ class UserController extends BaseController{
         return new Promise((resolve, reject) => {
 
 
-            console.log(req.body.email);
+            //console.log(req.body.email);
             //Find the user base on the token
             this.userModel.findOne({ email: req.body.email }).then((user)=>
             {
@@ -321,13 +321,13 @@ class UserController extends BaseController{
             //find the users based on the token
             this.findUserByToken(req).then((user)=>{
 
-                console.log(user);
-                console.log("password"+req.body.password);
+                //console.log(user);
+               // console.log("password"+req.body.password);
 
                 //hash the new password
                 user.password = this.hashPassword(req.body.password);
 
-                console.log("hashed password" +user.password)
+               // console.log("hashed password" +user.password)
 /*
 
                 user.email = this.encrypt(user.email);
@@ -336,7 +336,7 @@ class UserController extends BaseController{
                 user.resetPasswordToken = undefined;
                 user.resetPasswordExpires = undefined;
                 var email = this.decrypt(user.email);
-                console.log("email is here"+email);
+               // console.log("email is here"+email);
                 //save user change
                 user.save().then(saved => {
                     this.sendEmailPasswordChanged(email);

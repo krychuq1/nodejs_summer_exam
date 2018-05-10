@@ -203,7 +203,7 @@ userRouter.post('/forgot', (req, res)=>{
     }, err => {
         res.status(500).send(err);
     }).catch(err=>{
-        console.log(err);
+        //console.log(err);
         res.status(500).send(err);
     })
 });
@@ -244,7 +244,7 @@ userRouter.post('/image', (req, res) => {
     let base64Data = req.body.src.replace(/^data:image\/png;base64,/, "");
     const file = './images/profiles/'+ image;
     fs.writeFile(file, base64Data, 'base64', function(err) {
-        console.log(err, '<----err');
+      //  console.log(err, '<----err');
     });
     res.send({imgUrl: image})
 });
