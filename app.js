@@ -42,22 +42,62 @@ app.use('/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagger.sw
 app.use('/swagger', swaggerRoute);
 
 server.listen(port);
-let connections = [];
+
 console.log('RESTful API server started on: ' + port);
+
+//socket
+
+//users
+let users = [];
+let connections = [];
+
 io.on('connection', (socket)=>{
     connections.push(socket);
     console.log('Clients connected ', connections.length);
-
+    socket.msgs = [];
     //disconnect
-    socket.on('disconnect', (data)=>{
+    socket.on('disconnect', (data)=> {
+        console.log('client disconnected');
+        users.splice(users.indexOf(socket.username));
         connections.splice(connections.indexOf(socket), 1);
-        console.log('Clients connected ', connections.length);
+        io.sockets.emit('users', users);
+        // console.log('Clients connected ', connections.length);
     });
     socket.on('send message', (data) => {
-        io.sockets.emit('new message', {msg: 'siemka z servera'})
-    })
+        socket.msgs.push(data);
+        socket.emit('history', socket.msgs);
+        console.log(data);
+        //loop through connections
+        for(let i = 0; i < connections.length; i++){
+            console.log('in da loop');
+            if(connections[i].username === data.receiver){
+                connections[i].emit('receive', data);
+                connections[i].msgs.push(data);
+                connections[i].emit('history',  connections[i].msgs);
+
+                console.log('we should send msg to ', connections[i].username)
+            }
+        }
+        // io.sockets.emit('new message', {msg: 'siemka z servera'})
+    });
+
+
     socket.on('new user', (user) => {
         console.log(' new user connected ', user);
+        socket.username = user;
+        if(!checkIfUserAdded(socket.username))
+            users.push(socket.username);
+            io.sockets.emit('users', users);
     })
+
 });
+
+function checkIfUserAdded(username){
+    for(let i = 0; i<users.length; i++){
+        if(users[i] === username){
+            return true;
+        }
+    }
+    return false;
+}
 module.exports = app;
