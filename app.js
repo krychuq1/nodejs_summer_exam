@@ -57,11 +57,15 @@ io.on('connection', (socket)=>{
     socket.msgs = [];
     //disconnect
     socket.on('disconnect', (data)=> {
-        console.log('client disconnected');
-        users.splice(users.indexOf(socket.username));
+        console.log(socket.username);
+        console.log(users.indexOf(socket.username));
+        if(users.indexOf(socket.username) < -1){
+            users.splice(users.indexOf(socket.username), 1);
+
+        }
         connections.splice(connections.indexOf(socket), 1);
+        console.log('client disconnected ', users, " <---- users after ");
         io.sockets.emit('users', users);
-        // console.log('Clients connected ', connections.length);
     });
     socket.on('send message', (data) => {
         socket.msgs.push(data);
@@ -74,9 +78,7 @@ io.on('connection', (socket)=>{
                 connections[i].emit('receive', data);
                 connections[i].msgs.push(data);
                 connections[i].emit('history',  connections[i].msgs);
-
-                console.log('we should send msg to ', connections[i].username)
-            }
+                }
         }
         // io.sockets.emit('new message', {msg: 'siemka z servera'})
     });
@@ -87,6 +89,7 @@ io.on('connection', (socket)=>{
         socket.username = user;
         if(!checkIfUserAdded(socket.username))
             users.push(socket.username);
+            console.log('we are gonna send users list to client ', users)
             io.sockets.emit('users', users);
     })
 
