@@ -1,6 +1,6 @@
 import request from 'request';
 
-const secretKey = "6LeAUkYUAAAAAPlygY7k5OjnXziUyFqOQolcLt0l";
+const secretKey = "6Lf6vlgUAAAAALX_1YEK15xCCyzaNclNE5LsrGf3";
 const urlToVerify = "https://www.google.com/recaptcha/api/siteverify?secret=";
 
 export function validateCaptcha(req, res, next) {
