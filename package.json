@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm run build && node dist/app.js"
+    "start": "npm run build && node dist/app.js",
     "dev": "nodemon --exec babel-node app.js",
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
     "start2": "npm run build && node dist/app.js"
