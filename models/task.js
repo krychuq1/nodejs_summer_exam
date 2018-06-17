@@ -1,9 +1,11 @@
-/**
- * Created by Palko on 29/01/2018.
- */
 import db from '../database/databaseConnection';
 
 class TaskModel{
+    /**
+     * Constructor:
+     * - Define connection to database
+     * - Define the table schema for tasks
+     */
     constructor(){
         this.mongoose = db.getMongoose();
         this.Schema = this.mongoose.Schema;
