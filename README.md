@@ -4,13 +4,7 @@ Docker
 3. Run docker-compose up (in Windows PowerShell - if Windows OS)
 4. The application will be accessible through browser
 
-Front-End
-
-1. run npm install in the angular folder
-2. run ng serve to start the front-end(remember to be in angular folder)
-
 MongoDb
-
 1. In order to run application in dev env you have to start MongoDB locally
 
 Backend

@@ -2,7 +2,11 @@ import express from 'express';
 import taskController from "../controllers/task.controller";
 import {checkTokenValidity} from '../services/token.service';
 import htmlencode from 'htmlencode';
-//define router
+
+/**
+ * Defining tasks router
+ * @type {Router|router|*}
+ */
 let taskRouter = express.Router();
 let widget = new htmlencode.Encoder('string');
 
@@ -47,9 +51,7 @@ let widget = new htmlencode.Encoder('string');
  *
  */
 taskRouter.post('/', checkTokenValidity, (req, res)=> {
-
     req.body['postedBy'] = req.user._id;
-
     taskController.create(req.body).then((created, err)=>{
         if(err)
             res.status(400).send(err);
@@ -74,7 +76,7 @@ taskRouter.post('/', checkTokenValidity, (req, res)=> {
  */
 taskRouter.get('/', function(req, res) {
     taskController.getAll().then((tasks, err)=>{
-        var encodedTasks = [];
+        let encodedTasks = [];
         if(err)
             res.status(400).send(err);
         tasks.forEach(function (task) {
@@ -113,7 +115,7 @@ taskRouter.get('/', function(req, res) {
 
 taskRouter.get('/user', checkTokenValidity, function(req, res) {
 
-    taskController.getuserstasks(req.user._id).then((tasks, err)=>{
+    taskController.getTaskByUserId(req.user._id).then((tasks, err)=>{
         var encodedTasks = [];
         if(err)
             res.status(400).send(err);
@@ -160,13 +162,6 @@ taskRouter.delete('/:taskId', checkTokenValidity, function (req, res) {
         res.status(400).send(err);
 
     });
-    //     .then((deleted, err)=>{
-    //     if(err)
-    //         res.status(400).send(err);
-    //     res.send(deleted);
-    // }).catch((e)=>{
-    //     res.status(400).send(e.errmsg);
-    // });
 });
 
 /**

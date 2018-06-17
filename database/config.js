@@ -1,9 +1,3 @@
-/**
- * Created by Palko on 29/01/2018.
- */
-// module.exports = {
-//     'secret': 'ilovescotchyscotch',
-// };
 const config = {
     //run for the docker container
     // mongoUrl : 'mongodb://mongo:27017/websecurity'
