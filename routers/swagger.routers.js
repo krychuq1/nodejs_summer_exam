@@ -1,6 +1,10 @@
 import express from 'express';
 import Swagger from '../services/swagger.service';
 
+/**
+ * Defining swagger router
+ * @type {Router|router|*}
+ */
 const router = express.Router();
 const swagger = new Swagger();
 

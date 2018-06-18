@@ -6,7 +6,10 @@ import fs from 'fs';
 import {checkTokenValidity} from "../services/token.service";
 import {role} from "../services/roles.service";
 
-//define router
+/**
+ * Defining the router
+ * @type {Router|router|*}
+ */
 let userRouter = express.Router();
 
 /**
@@ -163,11 +166,11 @@ userRouter.post('/login', (req, res)=>{
     userController.loginUser(req.body).then((data)=>{
         res.cookie("thisisTestCookie", "values", { secure:false, maxAge:120000, httpOnly: true })
             .json({
-            success: true,
-            message: 'Enjoy your token!',
-            token: data.token,
-            user: data.user
-        });
+                success: true,
+                message: 'Enjoy your token!',
+                token: data.token,
+                user: data.user
+            });
 
     }, (err)=>{
         if(err.lock){
@@ -196,7 +199,10 @@ userRouter.post('/login', (req, res)=>{
  *
  */
 
-//Rout that checks if the user exists & send email with password reset
+/**
+ * Rout that checks if the user exists
+ * & send email with password reset
+ */
 userRouter.post('/forgot', (req, res)=>{
     userController.forgotPassword(req).then((data)=>{
         res.send(data);
@@ -209,23 +215,26 @@ userRouter.post('/forgot', (req, res)=>{
 });
 
 
-//Link from the email checks if the user who wanted to change the password exists and the token is not expired
+/**
+ * Link from the email
+ * checks if the user who wanted to change the password exists
+ * and the token is not expired
+ */
 userRouter.get('/reset/:token', function(req, res) {
-
     userController.findUserByToken(req).then((user)=>{
-
         if (!user) {
             //If user does not exist navigate to forgot password form
             return res.redirect('https://angular.sevenamstudio.com/#/forgot');
-    }
-
+        }
         //else navigate to rest form where user can type new password
         return res.redirect('http://' + 'angular.sevenamstudio.com/#' + '/reset/'+ req.params.token);
     });
 
 });
 
-//Submmit new password
+/**
+ * Submmit new password
+ */
 userRouter.post('/reset/:token', function(req, res) {
 
     userController.setNewPassword(req).then((data)=>{
@@ -244,7 +253,7 @@ userRouter.post('/image', (req, res) => {
     let base64Data = req.body.src.replace(/^data:image\/png;base64,/, "");
     const file = './images/profiles/'+ image;
     fs.writeFile(file, base64Data, 'base64', function(err) {
-      //  console.log(err, '<----err');
+        //  console.log(err, '<----err');
     });
     res.send({imgUrl: image})
 });

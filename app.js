@@ -3,9 +3,9 @@ import bodyParser from 'body-parser';
 import cors from  'cors';
 import path from  'path';
 import logger from  'morgan';
-import config from  './config'; // // get our config file
+import config from './database/config'; // // get our config file
 import Swagger from './services/swagger.service';
-import {swaggerRoute, userRouter, taskRouter,homeRouter,shareTaskRouter} from './routers/index.routing';
+import {swaggerRoute, userRouter, taskRouter,shareTaskRouter} from './routers/index.routing';
 import http from 'http';
 import socketIo from 'socket.io';
 const port = process.env.PORT || 3000;
@@ -34,7 +34,6 @@ app.use('/images', express.static('images/profiles'));
 app.use('/users', userRouter);
 app.use('/tasks', taskRouter);
 app.use('/shareTask',shareTaskRouter),
-app.use('', homeRouter);
 
 
 // Swagger
