@@ -2,17 +2,15 @@ import userModel from '../models/user'
 import bcrypt from 'bcrypt-nodejs';
 import {generateToken} from '../services/token.service';
 import BaseController from "./base.controller";
-import taskModel from "../models/task";
-import checkTokenValidity from '../services/token.service';
-const key = Buffer.from('5ebe2294ecd0e0f08eab7690d2a6ee695ebe2294ecd0e0f08eab7690d2a6ee69', 'hex');
-const iv  = Buffer.from('26ae5cc854e36b6bdfca366848dea6bb', 'hex');
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
 import {sender} from "../services/mailer.service";
 
+const key = Buffer.from('5ebe2294ecd0e0f08eab7690d2a6ee695ebe2294ecd0e0f08eab7690d2a6ee69', 'hex');
+const iv  = Buffer.from('26ae5cc854e36b6bdfca366848dea6bb', 'hex');
 const EMAIL_PATTERN = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
 const PASS_PATTERN = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/;
 const COMPANY_PATTERN = /^[a-zA-Z0-9]{2,}$/;
+const mailer = 'http://localhost:4200/#/reset/';
 
 class UserController extends BaseController{
 
@@ -168,7 +166,7 @@ class UserController extends BaseController{
             subject: 'Node.js Password Reset',
             text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
             'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-            'https://' + 'frontend.sevenamstudio.com' + '/users/reset/' + token + '\n\n' +
+            mailer + token + '\n\n' +
             'If you did not request this, please ignore this email and your password will remain unchanged.\n'
         };
 
