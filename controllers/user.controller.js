@@ -13,7 +13,10 @@ const COMPANY_PATTERN = /^[a-zA-Z0-9]{2,}$/;
 const mailer = 'http://localhost:4200/#/reset/';
 
 class UserController extends BaseController{
-
+    /**
+     * Constructor:
+     * super() defining userModel as parent object
+     */
     constructor(){
         super(userModel.getModel());
         this.userModel = userModel.getModel();
@@ -43,7 +46,7 @@ class UserController extends BaseController{
     //login user
     loginUser(data){
         return new Promise((resolve, reject)=>{
-            //get user based on email
+            //get user object based on email
             this.userModel.findOne({
                 email: this.encrypt(data.email)
             }, (err, user)=>{
@@ -51,17 +54,15 @@ class UserController extends BaseController{
                 //if there is no user return false
                 if(!user)
                     return reject(false);
-                //check if user is not lock
+                //check if user is not locked
                 if(user.lockUntil < new Date()){
                     //check if password is not correct
                     if(this.comparePassword(data.password, user.password)){
                         let token = generateToken(user);
-                        console.log('User at login is: ', user);
                         let responseToReturn = {
                             token : token,
                             user: user
                         };
-                        console.log('Token is made of: ', responseToReturn, ' where user in token is: ', responseToReturn.user);
                         return resolve(responseToReturn);
                     }else{
                         //add failed login attam
@@ -187,18 +188,14 @@ class UserController extends BaseController{
             //find if user exists
             this.findUser(this.encrypt(request.body.email)).then((user)=>{
                 //generate token
-                this.generateRecoveryToken().then((token)=>
-                {
+                this.generateRecoveryToken().then((token)=>{
                     //save token and expiry of it
                     user.resetPasswordToken = token;
                     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
                     //save the user
-                    user.save().then((saved)=>
-                    {
-
+                    user.save().then((saved)=>{
                         this.sendEmail(user,token,request);
                         return resolve(saved);
-
                     },(error)=>{
                         return reject(error);
                     });
@@ -206,25 +203,17 @@ class UserController extends BaseController{
                 },(error)=>{
                     return reject(error);
                 });
-
             },(error)=>{
                 return reject(error);
             });
-
-
         },(error)=>{
             return reject(error);
-
         }).catch((error)=>{
-                reject(error);
-            }
-        );
-
-
+            reject(error);
+        });
     }
 
     findUserByToken(req) {
-
         return new Promise((resolve, reject) => {
 
             //Find the user base on the token
@@ -254,13 +243,9 @@ class UserController extends BaseController{
             },(error)=>
             {
                 return reject(error);
-            })
-
-            ;
+            });
         });
-
     }
-
 
     findUserByEmailInToken(email) {
         return new Promise((resolve, reject) => {
@@ -273,9 +258,7 @@ class UserController extends BaseController{
     }
 
     setNewPassword(req){
-
         return new Promise((resolve, reject) => {
-
             //find the users based on the token
             this.findUserByToken(req).then((user)=>{
                 //hash the new password
@@ -288,20 +271,15 @@ class UserController extends BaseController{
                 user.save().then(saved => {
                     this.sendEmailPasswordChanged(email);
                     return resolve(user);
-
                 },(error=>{
                     return reject(error);
                 }));
-
-
             },(error=>{
                 return reject(error);
             }));
 
         });
-
     }
-
 }
 const userController = new UserController();
 export default userController;

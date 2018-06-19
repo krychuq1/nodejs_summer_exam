@@ -4,12 +4,16 @@ import {decrypt} from '../services/encryption.service';
 import taskController from "../controllers/task.controller";
 
 class ShareTaskController  extends BaseController {
+
+    /**
+     * Constructor:
+     * super() defining boardModel as parent object
+     */
     constructor() {
         super(boardModel.getModel());
         this.boardModel = boardModel.getModel();
     }
     shareTask(board) {
-
         let userObj = new this.boardModel(board);
         //save new model
         return userObj.save();
@@ -20,7 +24,6 @@ class ShareTaskController  extends BaseController {
             let promises = [];
             let tasks = [];
             let decryptedemail = decrypt(userEmail);
-
             this.model.find({requestReceiver: decryptedemail}, (err, requests) => {
                 if (err) return reject(err);
                 //loop through requested tasks
@@ -29,16 +32,19 @@ class ShareTaskController  extends BaseController {
                     let promise = taskController.getById(requestedTask.taskId).then((task, err)=>{
                         if(task!=null){
                             tasks.push(task)
+                        }else{
+                            return err;
                         }
                     });
                     //push to promise array
                     promises.push(promise);
-
                 });
                 //when all promises are done
                 Promise.all(promises).then(()=>{
+                    //resole first promise
                     resolve(tasks);
-                })
+                });
+
             });
         });
     }

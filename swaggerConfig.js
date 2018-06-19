@@ -1,7 +1,7 @@
 let swaggerConfig = {
     swaggerDefinition: {
         info: {
-            title: 'WebSecurity',
+            title: 'NodeJsBackend',
             version: '1.0.0',
             description: 'This is API for school project'
         },

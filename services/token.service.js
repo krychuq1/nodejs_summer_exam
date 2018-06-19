@@ -23,10 +23,9 @@ export function checkTokenValidity(req,res,next) {
                 req.user = user;
                 next();
             },(err)=>{
-                 res.send(err);
+                res.send(err);
             });
         });
-
     } else {
         res.sendStatus(403);
     }
@@ -41,6 +40,7 @@ export function checkTokenValidity(req,res,next) {
 }
 
 export function generateToken(user) {
+    //adding the user email as part of the jwt
     const payload = {
         email: user.email
     };

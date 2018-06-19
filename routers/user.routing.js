@@ -202,6 +202,10 @@ userRouter.post('/login', (req, res)=>{
  *
  */
 
+/**
+ * Rout that checks if the user exists
+ * & send email with password reset
+ */
 userRouter.post('/forgot', (req, res)=>{
     userController.forgotPassword(req).then((data)=>{
         res.send(data);
@@ -214,7 +218,11 @@ userRouter.post('/forgot', (req, res)=>{
 });
 
 
-//Link from the email checks if the user who wanted to change the password exists and the token is not expired
+/**
+ * Link from the email
+ * checks if the user who wanted to change the password exists
+ * and the token is not expired
+ */
 userRouter.get('/reset/:token', function(req, res) {
     userController.findUserByToken(req).then((user)=>{
         if (!user) {
@@ -227,7 +235,9 @@ userRouter.get('/reset/:token', function(req, res) {
 
 });
 
-//Submmit new password
+/**
+ * Submmit new password
+ */
 userRouter.post('/reset/:token', function(req, res) {
 
     userController.setNewPassword(req).then((data)=>{
