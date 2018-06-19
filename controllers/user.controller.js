@@ -4,7 +4,7 @@ import {generateToken} from '../services/token.service';
 import BaseController from "./base.controller";
 import crypto from 'crypto';
 import {sender} from "../services/mailer.service";
-
+import request   from 'request';
 const key = Buffer.from('5ebe2294ecd0e0f08eab7690d2a6ee695ebe2294ecd0e0f08eab7690d2a6ee69', 'hex');
 const iv  = Buffer.from('26ae5cc854e36b6bdfca366848dea6bb', 'hex');
 const EMAIL_PATTERN = /^[a-zA-Z]+[a-zA-Z0-9._+]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/;
@@ -20,6 +20,24 @@ class UserController extends BaseController{
     constructor(){
         super(userModel.getModel());
         this.userModel = userModel.getModel();
+
+    }
+    sendSms(number){
+        const options = {
+
+        };
+        console.log(number);
+        request.post({
+            method: 'POST',
+            url:  'https://platform.clickatell.com/messages',
+            body: {content: "You are successfully registered", to: [number]},
+            json: true,
+            headers: {
+                'Authorization': 'OWqta_8jQ8SSqXKIV9HL8w=='
+            }
+        }, function (error, res) {
+           console.log(error);
+        });
 
     }
     //signup user
