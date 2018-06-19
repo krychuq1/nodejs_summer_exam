@@ -9,7 +9,6 @@ export function decrypt(email) {
     return dec;
 }
 
-
 export function encrypt(email){
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
     var crypted = cipher.update(email,'utf8','hex');

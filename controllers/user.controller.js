@@ -7,33 +7,29 @@ import {sender} from "../services/mailer.service";
 
 const key = Buffer.from('5ebe2294ecd0e0f08eab7690d2a6ee695ebe2294ecd0e0f08eab7690d2a6ee69', 'hex');
 const iv  = Buffer.from('26ae5cc854e36b6bdfca366848dea6bb', 'hex');
-const EMAIL_PATTERN = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
+const EMAIL_PATTERN = /^[a-zA-Z]+[a-zA-Z0-9._+]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/;
 const PASS_PATTERN = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/;
 const COMPANY_PATTERN = /^[a-zA-Z0-9]{2,}$/;
 const mailer = 'http://localhost:4200/#/reset/';
 
 class UserController extends BaseController{
 
-
     constructor(){
         super(userModel.getModel());
         this.userModel = userModel.getModel();
 
     }
-
     //signup user
     signUpUser(user){
-        //add defalut role
+        //add default role
         user.role = 'user';
         return new Promise((resolve, reject)=>{
             //check for regex
             if (EMAIL_PATTERN.test(user.email)&&PASS_PATTERN.test(user.password)
                 &&COMPANY_PATTERN.test(user.companyName)) {
-               // console.log("Valid user");
                 //hash password
                 user.password = this.hashPassword(user.password);
                 user.email = this.encrypt(user.email);
-                //console.log(user.email);
                 //create new model
                 let userObj = new this.userModel(user);
                 //save new model
@@ -48,9 +44,6 @@ class UserController extends BaseController{
     loginUser(data){
         return new Promise((resolve, reject)=>{
             //get user based on email
-
-            //console.log(this.encrypt(data.email));
-
             this.userModel.findOne({
                 email: this.encrypt(data.email)
             }, (err, user)=>{
@@ -63,10 +56,12 @@ class UserController extends BaseController{
                     //check if password is not correct
                     if(this.comparePassword(data.password, user.password)){
                         let token = generateToken(user);
+                        console.log('User at login is: ', user);
                         let responseToReturn = {
                             token : token,
                             user: user
                         };
+                        console.log('Token is made of: ', responseToReturn, ' where user in token is: ', responseToReturn.user);
                         return resolve(responseToReturn);
                     }else{
                         //add failed login attam
@@ -156,10 +151,7 @@ class UserController extends BaseController{
 
 
     sendEmail(user,token,request){
-
-
         var email = this.decrypt(user.email);
-
         const mailOptions = {
             from: 'superSecureApp@gmail.com', // sender address
             to: email, // list of receivers
@@ -171,14 +163,11 @@ class UserController extends BaseController{
         };
 
         sender().sendMail(mailOptions, function(err) {
-           // console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
         });
     }
 
 
     sendEmailPasswordChanged(email){
-
-
         const mailOptions = {
             from: 'superSecureApp@gmail.com', // sender address
             to: email, // list of receivers
@@ -187,7 +176,6 @@ class UserController extends BaseController{
         };
 
         sender().sendMail(mailOptions, function(err) {
-            //console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
         });
     }
 
@@ -195,45 +183,31 @@ class UserController extends BaseController{
 
 
     forgotPassword(request){
-
         return new Promise((resolve, reject)=> {
-
-
             //find if user exists
             this.findUser(this.encrypt(request.body.email)).then((user)=>{
-
-                //console.log(user);
-
                 //generate token
                 this.generateRecoveryToken().then((token)=>
                 {
                     //save token and expiry of it
                     user.resetPasswordToken = token;
                     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-
-                    //console.log("reset"+user.resetPasswordToken);
-
                     //save the user
                     user.save().then((saved)=>
                     {
-
-                        //console.log("we are sending email");
 
                         this.sendEmail(user,token,request);
                         return resolve(saved);
 
                     },(error)=>{
-                       // console.log(error);
                         return reject(error);
                     });
 
                 },(error)=>{
-                  //  console.log(error);
                     return reject(error);
                 });
 
             },(error)=>{
-               // console.log(error);
                 return reject(error);
             });
 
@@ -253,9 +227,8 @@ class UserController extends BaseController{
 
         return new Promise((resolve, reject) => {
 
-
             //Find the user base on the token
-            this.userModel.findOne({ resetPasswordToken: req.params.token, /*resetPasswordExpires: { $gt: Date.now() }*/ }).then((user)=>
+            this.userModel.findOne({ resetPasswordToken: req.params.token}).then((user)=>
             {
                // console.log("user"+user);
                 return resolve(user);
@@ -272,11 +245,7 @@ class UserController extends BaseController{
 
 
     findUserByEmailInToken(req) {
-
         return new Promise((resolve, reject) => {
-
-
-            //console.log(req.body.email);
             //Find the user base on the token
             this.userModel.findOne({ email: req.body.email }).then((user)=>
             {
@@ -294,21 +263,12 @@ class UserController extends BaseController{
 
 
     findUserByEmailInToken(email) {
-
-
         return new Promise((resolve, reject) => {
-
             //Find the user base on the token
-            this.userModel.findOne({ email: email}).then((user)=>
-            {
-                return resolve(user);
-
-            },(error)=>
-            {
+            this.userModel.findOne({ email: email}).then((user)=> {
+                return resolve(user);},(error)=> {
                 return reject(error);
-            })
-
-            ;
+            });
         });
     }
 
@@ -318,23 +278,12 @@ class UserController extends BaseController{
 
             //find the users based on the token
             this.findUserByToken(req).then((user)=>{
-
-                //console.log(user);
-               // console.log("password"+req.body.password);
-
                 //hash the new password
                 user.password = this.hashPassword(req.body.password);
-
-               // console.log("hashed password" +user.password)
-/*
-
-                user.email = this.encrypt(user.email);
-*/
                 //set the reset token back to undefined
                 user.resetPasswordToken = undefined;
                 user.resetPasswordExpires = undefined;
                 var email = this.decrypt(user.email);
-               // console.log("email is here"+email);
                 //save user change
                 user.save().then(saved => {
                     this.sendEmailPasswordChanged(email);

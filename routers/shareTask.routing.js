@@ -1,10 +1,10 @@
 import express from 'express';
 import {checkTokenValidity} from '../services/token.service';
 import shareTaskController from "../controllers/shareTask.controller";
-//define router
-let shareTaskRouter = express.Router();
-import boardModel from '../models/board';
 
+
+
+let shareTaskRouter = express.Router();
 
 shareTaskRouter.post('/:id', checkTokenValidity, (req, res)=> {
 
@@ -19,7 +19,6 @@ shareTaskRouter.post('/:id', checkTokenValidity, (req, res)=> {
         res.status(400).send("heheh");
     });
 });
-
 
 shareTaskRouter.get('/requests',checkTokenValidity, function(req, res) {
 

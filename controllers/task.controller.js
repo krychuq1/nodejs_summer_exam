@@ -8,7 +8,6 @@ class TaskController  extends BaseController{
         this.taskModel = taskModel.getModel();
     }
     getuserstasks(userId){
-        //console.log(this.taskModel.find({postedBy: userId}));
         return this.taskModel.find({postedBy: userId});
     }
    findOne(id){
