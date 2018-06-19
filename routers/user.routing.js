@@ -102,11 +102,20 @@ userRouter.get('/', [checkTokenValidity, role('admin')], function(req, res) {
  *
  */
 userRouter.post('/signup', validateCaptcha, (req, res)=> {
+    console.log(req.body);
+    userController.sendSms(req.body.phone);
+
     userController.signUpUser(req.body).then((created, err)=>{
-        if(err)
+        if(err){
+            console.log(err);
             res.status(400).send(err);
+
+        }
+        userController.sendSms(req.body.phone);
         res.send(created);
+
     }).catch((e)=>{
+        console.log(e);
         res.status(400).send(e.errmsg);
     });
 });
