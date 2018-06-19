@@ -10,7 +10,8 @@ const iv  = Buffer.from('26ae5cc854e36b6bdfca366848dea6bb', 'hex');
 const EMAIL_PATTERN = /^[a-zA-Z]+[a-zA-Z0-9._+]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/;
 const PASS_PATTERN = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/;
 const COMPANY_PATTERN = /^[a-zA-Z0-9]{2,}$/;
-const mailer = 'http://localhost:4200/#/reset/';
+// const mailer = 'http://localhost:4200/#/reset/';
+const mailer = 'https://nodejs-summer-exam.firebaseapp.com/#/reset/';
 
 class UserController extends BaseController{
     /**
