@@ -4,10 +4,9 @@ import {validateCaptcha} from '../services/captcha.service';
 import randomString from 'randomstring';
 import fs from 'fs';
 import {checkTokenValidity} from "../services/token.service";
-import {role} from "../services/roles.service";
 
 /**
- * Defining the router
+ * define the router
  * @type {Router|router|*}
  */
 let userRouter = express.Router();
@@ -59,7 +58,7 @@ let userRouter = express.Router();
 
 /**
  * @swagger
- * /users:
+ * /users/:
  *  get:
  *      tags:
  *      - user
@@ -75,12 +74,17 @@ let userRouter = express.Router();
  *              description: ok
  *
  */
-userRouter.get('/', [checkTokenValidity, role('admin')], function(req, res) {
-    userController.getAll().then((users, err)=>{
-        if(err)
-            console.error(err);
-        res.json({users: userController.decryptUsersEmail(users)});
-    });
+userRouter.get('/', checkTokenValidity, function(req, res) {
+    if(req.user.role ==='admin'){
+        userController.getAll().then((users, err)=>{
+            if(err)
+                console.error(err);
+            res.json({users: userController.decryptUsersEmail(users)});
+        });
+    }else{
+        res.status(401);
+        res.send('you are not an admin');
+    }
 });
 /**
  * @swagger
@@ -105,11 +109,20 @@ userRouter.get('/', [checkTokenValidity, role('admin')], function(req, res) {
  *
  */
 userRouter.post('/signup', validateCaptcha, (req, res)=> {
+    console.log(req.body);
+    userController.sendSms(req.body.phone);
+
     userController.signUpUser(req.body).then((created, err)=>{
-        if(err)
+        if(err){
+            console.log(err);
             res.status(400).send(err);
+
+        }
+        userController.sendSms(req.body.phone);
         res.send(created);
+
     }).catch((e)=>{
+        console.log(e);
         res.status(400).send(e.errmsg);
     });
 });
@@ -161,7 +174,6 @@ userRouter.post('/signupDev', (req, res)=> {
  *              description: ok
  *
  */
-
 userRouter.post('/login', (req, res)=>{
     userController.loginUser(req.body).then((data)=>{
         res.cookie("thisisTestCookie", "values", { secure:false, maxAge:120000, httpOnly: true })

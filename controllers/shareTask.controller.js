@@ -2,6 +2,7 @@ import boardModel from '../models/board';
 import BaseController from './base.controller';
 import {decrypt} from '../services/encryption.service';
 import taskController from "../controllers/task.controller";
+
 class ShareTaskController  extends BaseController {
 
     /**
@@ -42,7 +43,7 @@ class ShareTaskController  extends BaseController {
                 Promise.all(promises).then(()=>{
                     //resole first promise
                     resolve(tasks);
-                })
+                });
 
             });
         });

@@ -2,17 +2,15 @@ import userModel from '../models/user'
 import bcrypt from 'bcrypt-nodejs';
 import {generateToken} from '../services/token.service';
 import BaseController from "./base.controller";
-import taskModel from "../models/task";
-import checkTokenValidity from '../services/token.service';
+import crypto from 'crypto';
+import {sender} from "../services/mailer.service";
+import request   from 'request';
 const key = Buffer.from('5ebe2294ecd0e0f08eab7690d2a6ee695ebe2294ecd0e0f08eab7690d2a6ee69', 'hex');
 const iv  = Buffer.from('26ae5cc854e36b6bdfca366848dea6bb', 'hex');
-import crypto from 'crypto';
-import nodemailer from 'nodemailer';
-import {sender} from "../services/mailer.service";
-
-const EMAIL_PATTERN = /^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/;
+const EMAIL_PATTERN = /^[a-zA-Z]+[a-zA-Z0-9._+]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/;
 const PASS_PATTERN = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/;
 const COMPANY_PATTERN = /^[a-zA-Z0-9]{2,}$/;
+const mailer = 'http://localhost:4200/#/reset/';
 
 class UserController extends BaseController{
     /**
@@ -24,20 +22,35 @@ class UserController extends BaseController{
         this.userModel = userModel.getModel();
 
     }
+    sendSms(number){
+        const options = {
 
+        };
+        console.log(number);
+        request.post({
+            method: 'POST',
+            url:  'https://platform.clickatell.com/messages',
+            body: {content: "You are successfully registered", to: [number]},
+            json: true,
+            headers: {
+                'Authorization': 'OWqta_8jQ8SSqXKIV9HL8w=='
+            }
+        }, function (error, res) {
+           console.log(error);
+        });
+
+    }
     //signup user
     signUpUser(user){
-        //add defalut role
+        //add default role
         user.role = 'user';
         return new Promise((resolve, reject)=>{
             //check for regex
             if (EMAIL_PATTERN.test(user.email)&&PASS_PATTERN.test(user.password)
                 &&COMPANY_PATTERN.test(user.companyName)) {
-                // console.log("Valid user");
                 //hash password
                 user.password = this.hashPassword(user.password);
                 user.email = this.encrypt(user.email);
-                //console.log(user.email);
                 //create new model
                 let userObj = new this.userModel(user);
                 //save new model
@@ -87,7 +100,7 @@ class UserController extends BaseController{
     }
     decryptUsersEmail(users){
         users.forEach((user)=>{
-            user.email = this.decrypt(user.email);
+          user.email = this.decrypt(user.email);
         });
         return users;
     }
@@ -157,29 +170,23 @@ class UserController extends BaseController{
 
 
     sendEmail(user,token,request){
-
-
         var email = this.decrypt(user.email);
-
         const mailOptions = {
             from: 'superSecureApp@gmail.com', // sender address
             to: email, // list of receivers
             subject: 'Node.js Password Reset',
             text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
             'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-            'https://' + 'frontend.sevenamstudio.com' + '/users/reset/' + token + '\n\n' +
+            mailer + token + '\n\n' +
             'If you did not request this, please ignore this email and your password will remain unchanged.\n'
         };
 
         sender().sendMail(mailOptions, function(err) {
-            // console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
         });
     }
 
 
     sendEmailPasswordChanged(email){
-
-
         const mailOptions = {
             from: 'superSecureApp@gmail.com', // sender address
             to: email, // list of receivers
@@ -188,7 +195,6 @@ class UserController extends BaseController{
         };
 
         sender().sendMail(mailOptions, function(err) {
-            //console.log('info', 'An e-mail has been sent to ' + email + ' with further instructions.');
         });
     }
 
@@ -227,11 +233,33 @@ class UserController extends BaseController{
 
     findUserByToken(req) {
         return new Promise((resolve, reject) => {
-            //Find the user based on the token
-            this.userModel.findOne({resetPasswordToken: req.params.token}).then((user)=> {
-                // console.log("user"+user);
+
+            //Find the user base on the token
+            this.userModel.findOne({ resetPasswordToken: req.params.token}).then((user)=>
+            {
+               // console.log("user"+user);
                 return resolve(user);
-            },(error)=>{
+
+            },(error)=>
+            {
+                return reject(error);
+            })
+
+            ;
+        });
+
+    }
+
+
+    findUserByEmailInToken(req) {
+        return new Promise((resolve, reject) => {
+            //Find the user base on the token
+            this.userModel.findOne({ email: req.body.email }).then((user)=>
+            {
+                return resolve(user);
+
+            },(error)=>
+            {
                 return reject(error);
             });
         });
@@ -240,9 +268,8 @@ class UserController extends BaseController{
     findUserByEmailInToken(email) {
         return new Promise((resolve, reject) => {
             //Find the user base on the token
-            this.userModel.findOne({ email: email}).then((user)=>{
-                return resolve(user);
-            },(error)=>{
+            this.userModel.findOne({ email: email}).then((user)=> {
+                return resolve(user);},(error)=> {
                 return reject(error);
             });
         });

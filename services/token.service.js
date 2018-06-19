@@ -1,12 +1,15 @@
 import jwt from 'jsonwebtoken';
 import userController from '../controllers/user.controller';
 
+let client='http://localhost:4200';
+
 export function checkTokenValidity(req,res,next) {
     // check header or url parameters or post parameters for token
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    let token = req.body.token || req.query.token || req.headers['x-access-token'];
+
     // decode token
-    if (token) {
-        // verifies secret and checks expiration of token
+    if (token && checkRefererAndOrigin) {
+        // verifies secret and checks exp
         jwt.verify(token, ('superDuperSecretKey'), function (err, decoded) {
             if (err) {
                 return res.status(400).send("Failed to authenticate token.");
@@ -28,11 +31,19 @@ export function checkTokenValidity(req,res,next) {
     }
 
 }
+
+ function checkRefererAndOrigin(req){
+     if(req.headers['referer'] == client+"/" && req.headers['origin'] == client){
+         return true;
+     }
+    return false;
+}
+
 export function generateToken(user) {
     //adding the user email as part of the jwt
     const payload = {
         email: user.email
     };
-    // token expires in 600000 ms = 10 minutes
-    return jwt.sign(payload, 'superDuperSecretKey',  { expiresIn: "600000" });
+    //time can be changed
+    return jwt.sign(payload, 'superDuperSecretKey',  { expiresIn: Date.now()+5000 });
 }

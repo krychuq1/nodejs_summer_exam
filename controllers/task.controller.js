@@ -9,7 +9,10 @@ class TaskController  extends BaseController{
         super(taskModel.getModel());
         this.taskModel = taskModel.getModel();
     }
-    findOne(id){
+    getuserstasks(userId){
+        return this.taskModel.find({postedBy: userId});
+    }
+   findOne(id){
         return this.model.findById(id);
     }
     getTaskByUserId(userId){
